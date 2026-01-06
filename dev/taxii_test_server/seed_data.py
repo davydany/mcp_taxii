@@ -18,36 +18,45 @@ def seed_database():
             print("Database already seeded")
             return
 
-        # Create discovery
-        discovery = Discovery(
-            id="default",
+        # Create separate discoveries for TAXII 2.0 and 2.1
+        discovery_20 = Discovery(
+            id="discovery-20",
+            title=SERVER_TITLE,
+            description=SERVER_DESCRIPTION,
+            contact=SERVER_CONTACT,
+            default="http://localhost:8000/taxii2/api1-v20/",
+        )
+        db.add(discovery_20)
+
+        discovery_21 = Discovery(
+            id="discovery-21",
             title=SERVER_TITLE,
             description=SERVER_DESCRIPTION,
             contact=SERVER_CONTACT,
             default="http://localhost:8000/taxii21/api1/",
         )
-        db.add(discovery)
+        db.add(discovery_21)
 
-        # Create API roots
+        # Create API roots - URLs must match the {api_root} path parameter in FastAPI routes
         api_root_20 = APIRoot(
             id="api1-v20",
-            url="http://localhost:8000/taxii2/api1/",
+            url="http://localhost:8000/taxii2/api1-v20/",  # URL path matches the ID
             title="TAXII 2.0 API Root",
             description="API root for TAXII 2.0 testing",
             versions=["taxii-2.0"],
             max_content_length="10485760",
-            discovery_id="default",
+            discovery_id="discovery-20",
         )
         db.add(api_root_20)
 
         api_root_21 = APIRoot(
             id="api1",
-            url="http://localhost:8000/taxii21/api1/",
+            url="http://localhost:8000/taxii21/api1/",  # URL path matches the ID
             title="TAXII 2.1 API Root",
             description="API root for TAXII 2.1 testing",
             versions=["taxii-2.1"],
             max_content_length="10485760",
-            discovery_id="default",
+            discovery_id="discovery-21",
         )
         db.add(api_root_21)
 
@@ -78,8 +87,8 @@ def seed_database():
             api_root_id="api1-v20",
         )
         db.add(collection2_v20)
-        
-        # Collections for TAXII 2.1 root  
+
+        # Collections for TAXII 2.1 root
         collection1_v21 = Collection(
             id="collection-1",
             title="Malware Indicators",
@@ -204,11 +213,11 @@ def seed_database():
             # Convert permission format
             read_perms = user_config["permissions"]["can_read"]
             write_perms = user_config["permissions"]["can_write"]
-            
+
             # Handle wildcard permissions
             collections_read = None if "*" in read_perms else read_perms
             collections_write = None if "*" in write_perms else write_perms
-            
+
             user = User(
                 id=f"user-{user_id}",
                 username=username,
@@ -238,6 +247,6 @@ if __name__ == "__main__":
 
     # Initialize database
     init_db()
-    
+
     # Seed data
     seed_database()

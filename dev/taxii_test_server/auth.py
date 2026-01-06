@@ -75,9 +75,7 @@ def optional_auth(
     return None
 
 
-def check_collection_permission(
-    user: User | None, collection_id: str, permission: str = "read"
-) -> bool:
+def check_collection_permission(user: User | None, collection_id: str, permission: str = "read") -> bool:
     """Check if user has permission for a collection."""
     if not user:
         # Allow anonymous read access if configured

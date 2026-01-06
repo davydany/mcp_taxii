@@ -1,6 +1,5 @@
 """TAXII 2.1 client implementation."""
 
-
 from taxii2client.v21 import ApiRoot, Collection, Server
 
 from mcp_taxii.clients.base import TAXIIClient
@@ -33,7 +32,7 @@ class TAXII21Client(TAXIIClient):
 
     async def get_discovery(self) -> dict:
         """Get server discovery information.
-        
+
         TAXII 2.1 Specification:
         - Includes 'default' field for default API root
         - API roots include version and max_content_length
@@ -103,7 +102,7 @@ class TAXII21Client(TAXIIClient):
         match_version: str | list[str] | None = None,
     ) -> dict:
         """Get STIX objects from a collection.
-        
+
         TAXII 2.1 Specification:
         - Returns an envelope with 'more', 'next', and 'objects' fields
         - Supports pagination through 'next' parameter
@@ -121,20 +120,20 @@ class TAXII21Client(TAXIIClient):
             filters["limit"] = limit
         if added_after:
             filters["added_after"] = added_after
-        
+
         # Add match filters for TAXII 2.1
         if match_id:
             if isinstance(match_id, list):
                 filters["match[id]"] = ",".join(match_id)
             else:
                 filters["match[id]"] = match_id
-                
+
         if match_type:
             if isinstance(match_type, list):
                 filters["match[type]"] = ",".join(match_type)
             else:
                 filters["match[type]"] = match_type
-                
+
         if match_version:
             if isinstance(match_version, list):
                 filters["match[version]"] = ",".join(match_version)
@@ -146,25 +145,18 @@ class TAXII21Client(TAXIIClient):
 
         if not envelope:
             # Return empty envelope if no results
-            return {
-                "more": False,
-                "objects": []
-            }
+            return {"more": False, "objects": []}
 
         # Build TAXII 2.1 envelope response
-        result = {
-            "more": getattr(envelope, "more", False),
-            "objects": []
-        }
-        
+        result = {"more": getattr(envelope, "more", False), "objects": []}
+
         # Add 'next' field if pagination available
         if hasattr(envelope, "next") and envelope.next:
             result["next"] = envelope.next
-            
+
         # Extract objects from envelope
         if hasattr(envelope, "objects"):
-            result["objects"] = [obj.serialize() if hasattr(obj, "serialize") else obj 
-                               for obj in envelope.objects]
+            result["objects"] = [obj.serialize() if hasattr(obj, "serialize") else obj for obj in envelope.objects]
         elif isinstance(envelope, dict) and "objects" in envelope:
             result["objects"] = envelope["objects"]
             # Preserve envelope fields if already in correct format
@@ -186,9 +178,9 @@ class TAXII21Client(TAXIIClient):
         match_version: str | list[str] | None = None,
     ) -> dict:
         """Get object manifest from a collection.
-        
+
         TAXII 2.1 Specification:
-        - Returns an envelope with 'more' and 'objects' fields  
+        - Returns an envelope with 'more' and 'objects' fields
         - Manifest entries include 'versions' for version history
         """
         if not self.server:
@@ -203,20 +195,20 @@ class TAXII21Client(TAXIIClient):
             filters["limit"] = limit
         if added_after:
             filters["added_after"] = added_after
-            
+
         # Add match filters if supported
         if match_id:
             if isinstance(match_id, list):
                 filters["match[id]"] = ",".join(match_id)
             else:
                 filters["match[id]"] = match_id
-                
+
         if match_type:
             if isinstance(match_type, list):
                 filters["match[type]"] = ",".join(match_type)
             else:
                 filters["match[type]"] = match_type
-                
+
         if match_version:
             if isinstance(match_version, list):
                 filters["match[version]"] = ",".join(match_version)
@@ -228,21 +220,15 @@ class TAXII21Client(TAXIIClient):
 
         if not envelope:
             # Return empty envelope if no results
-            return {
-                "more": False,
-                "objects": []
-            }
+            return {"more": False, "objects": []}
 
         # Build TAXII 2.1 envelope response
-        result = {
-            "more": getattr(envelope, "more", False),
-            "objects": []
-        }
-        
+        result = {"more": getattr(envelope, "more", False), "objects": []}
+
         # Add 'next' field if pagination available
         if hasattr(envelope, "next") and envelope.next:
             result["next"] = envelope.next
-            
+
         # Extract manifest entries from envelope
         if hasattr(envelope, "objects"):
             for obj in envelope.objects:
@@ -264,9 +250,7 @@ class TAXII21Client(TAXIIClient):
 
         return result
 
-    async def add_objects(
-        self, collection_id: str, objects: list[dict], api_root: str | None = None
-    ) -> dict:
+    async def add_objects(self, collection_id: str, objects: list[dict], api_root: str | None = None) -> dict:
         """Add STIX objects to a collection."""
         if not self.server:
             raise RuntimeError("Not connected to TAXII server")

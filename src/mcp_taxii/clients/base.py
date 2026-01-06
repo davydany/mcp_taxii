@@ -40,7 +40,7 @@ class TAXIIClient(ABC):
         match_version: str | list[str] | None = None,
     ) -> dict:
         """Get STIX objects from a collection.
-        
+
         Returns:
             TAXII 2.0: Bundle dict with 'type', 'id', 'objects' fields
             TAXII 2.1: Envelope dict with 'more', 'next', 'objects' fields
@@ -49,9 +49,9 @@ class TAXIIClient(ABC):
 
     @abstractmethod
     async def get_manifest(
-        self, 
-        collection_id: str, 
-        api_root: str | None = None, 
+        self,
+        collection_id: str,
+        api_root: str | None = None,
         limit: int = 100,
         added_after: str | None = None,
         match_id: str | list[str] | None = None,
@@ -59,7 +59,7 @@ class TAXIIClient(ABC):
         match_version: str | list[str] | None = None,
     ) -> dict | list[dict]:
         """Get object manifest from a collection.
-        
+
         Returns:
             TAXII 2.0: List of manifest entry dicts
             TAXII 2.1: Envelope dict with 'more', 'next', 'objects' fields
@@ -67,8 +67,6 @@ class TAXIIClient(ABC):
         pass
 
     @abstractmethod
-    async def add_objects(
-        self, collection_id: str, objects: list[dict], api_root: str | None = None
-    ) -> dict:
+    async def add_objects(self, collection_id: str, objects: list[dict], api_root: str | None = None) -> dict:
         """Add STIX objects to a collection."""
         pass

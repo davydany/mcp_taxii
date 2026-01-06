@@ -11,7 +11,7 @@ async def test_initialize_taxii_with_params(mock_taxii_config):
     """Test initializing TAXII client with parameters."""
     # Import the actual function from the module
     from mcp_taxii.server import initialize_taxii
-    
+
     with patch("mcp_taxii.server.TAXII21Client") as mock_client_class:
         mock_client = AsyncMock()
         mock_client_class.return_value = mock_client
@@ -33,7 +33,7 @@ async def test_initialize_taxii_with_params(mock_taxii_config):
 async def test_initialize_taxii_with_env_vars():
     """Test initializing TAXII client with environment variables."""
     from mcp_taxii.server import initialize_taxii
-    
+
     with patch.dict(
         os.environ,
         {
@@ -57,7 +57,7 @@ async def test_initialize_taxii_with_env_vars():
 async def test_initialize_taxii_no_url():
     """Test initializing TAXII client without URL should fail."""
     from mcp_taxii.server import initialize_taxii
-    
+
     with pytest.raises(ValueError, match="TAXII URL must be provided"):
         await initialize_taxii.fn(username="user", password="pass")
 
@@ -66,7 +66,7 @@ async def test_initialize_taxii_no_url():
 async def test_initialize_taxii_version_20():
     """Test initializing TAXII 2.0 client."""
     from mcp_taxii.server import initialize_taxii
-    
+
     with patch("mcp_taxii.server.TAXII20Client") as mock_client_class:
         mock_client = AsyncMock()
         mock_client_class.return_value = mock_client
@@ -85,7 +85,7 @@ async def test_initialize_taxii_version_20():
 async def test_initialize_taxii_invalid_version():
     """Test initializing TAXII with invalid version."""
     from mcp_taxii.server import initialize_taxii
-    
+
     with pytest.raises(ValueError, match="Unsupported TAXII version"):
         await initialize_taxii.fn(
             url="https://test.server/taxii2/",
@@ -161,9 +161,7 @@ async def test_get_collection_objects_success(sample_stix_objects):
     assert len(result) == 2
     assert result[0]["type"] == "indicator"
     # Updated to match new signature with additional filter parameters
-    mock_client.get_objects.assert_called_once_with(
-        "test-collection", None, 50, None, None, None, None
-    )
+    mock_client.get_objects.assert_called_once_with("test-collection", None, 50, None, None, None, None)
 
 
 @pytest.mark.asyncio
@@ -186,9 +184,7 @@ async def test_get_object_manifest_success():
     assert len(result) == 1
     assert result[0]["id"] == "indicator--01234567-89ab-cdef-0123-456789abcdef"
     # Updated to match new signature with additional filter parameters
-    mock_client.get_manifest.assert_called_once_with(
-        "test-collection", None, 100, None, None, None, None
-    )
+    mock_client.get_manifest.assert_called_once_with("test-collection", None, 100, None, None, None, None)
 
 
 @pytest.mark.asyncio

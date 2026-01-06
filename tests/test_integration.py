@@ -33,7 +33,7 @@ async def test_taxii_20_integration():
     assert "api_roots" in discovery
     assert len(discovery["api_roots"]) == 2
 
-    # Test get collections  
+    # Test get collections
     collections = await get_collections.fn("api1-v20")
     assert len(collections) == 2
     assert collections[0]["alias"] == "malware-indicators"  # 2.0 has alias
@@ -105,7 +105,7 @@ async def test_taxii_21_pagination():
     objects = await get_collection_objects.fn("collection-1", api_root="api1", limit=2)
     assert "more" in objects
     assert len(objects["objects"]) <= 2
-    
+
     # If more objects available, next token should be present
     if objects["more"]:
         assert "next" in objects
@@ -124,10 +124,7 @@ async def test_taxii_filtering():
 
     # Test filtering by type
     objects = await get_collection_objects.fn(
-        "collection-1",
-        api_root="api1",
-        match_type=["indicator", "malware"],
-        limit=10
+        "collection-1", api_root="api1", match_type=["indicator", "malware"], limit=10
     )
     assert "objects" in objects
     # Check that returned objects match the filter
@@ -159,12 +156,8 @@ async def test_taxii_add_objects():
     }
 
     # Add object
-    result = await add_objects.fn(
-        "collection-1",
-        [test_object],
-        api_root="api1"
-    )
-    
+    result = await add_objects.fn("collection-1", [test_object], api_root="api1")
+
     assert "status" in result
     assert result["success_count"] > 0
 

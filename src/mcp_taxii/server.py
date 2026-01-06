@@ -171,9 +171,7 @@ async def get_object_manifest(
 
 
 @mcp.tool()
-async def add_objects(
-    collection_id: str, objects: list[dict], api_root: str | None = None
-) -> dict:
+async def add_objects(collection_id: str, objects: list[dict], api_root: str | None = None) -> dict:
     """
     Add STIX objects to a collection.
 
@@ -198,19 +196,18 @@ def run():
 
 def main():
     """Main entry point for the MCP TAXII server."""
-    import sys
-    import os
     from pathlib import Path
-    
+
     # Try to load .env file if it exists
     try:
         from dotenv import load_dotenv
-        env_path = Path.cwd() / '.env'
+
+        env_path = Path.cwd() / ".env"
         if env_path.exists():
             load_dotenv(env_path)
     except ImportError:
         pass  # dotenv not available, continue without it
-    
+
     # Run the server
     run()
     return 0
@@ -218,4 +215,5 @@ def main():
 
 if __name__ == "__main__":
     import sys
+
     sys.exit(main())

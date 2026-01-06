@@ -1,6 +1,5 @@
 """TAXII 2.0 client implementation compliant with TAXII 2.0 specification."""
 
-
 from taxii2client.v20 import ApiRoot, Collection, Server
 
 from mcp_taxii.clients.base import TAXIIClient
@@ -34,7 +33,7 @@ class TAXII20Client(TAXIIClient):
     async def get_discovery(self) -> dict:
         """
         Get server discovery information.
-        
+
         Returns discovery resource as per TAXII 2.0 spec section 4.1.
         """
         if not self.server:
@@ -47,7 +46,7 @@ class TAXII20Client(TAXIIClient):
             "contact": getattr(self.server, "contact", None),  # Added per spec
             "api_roots": [],
         }
-        
+
         # Add default API root if available
         if self.default_api_root:
             discovery_data["default"] = self.default_api_root.url
@@ -62,7 +61,7 @@ class TAXII20Client(TAXIIClient):
     async def get_collections(self, api_root: str | None = None) -> list[dict]:
         """
         Get available collections.
-        
+
         Returns collections as per TAXII 2.0 spec section 5.1.
         """
         if not self.server:
@@ -85,9 +84,7 @@ class TAXII20Client(TAXIIClient):
                 "description": getattr(collection, "description", None),
                 "can_read": collection.can_read,
                 "can_write": collection.can_write,
-                "media_types": getattr(collection, "media_types", [
-                    "application/vnd.oasis.stix+json; version=2.0"
-                ]),
+                "media_types": getattr(collection, "media_types", ["application/vnd.oasis.stix+json; version=2.0"]),
             }
             collections_data.append(coll_data)
 
@@ -105,9 +102,9 @@ class TAXII20Client(TAXIIClient):
     ) -> dict:
         """
         Get STIX objects from a collection.
-        
+
         Returns STIX bundle as per TAXII 2.0 spec section 5.3.
-        
+
         Args:
             collection_id: Collection to retrieve objects from
             api_root: API root URL (optional)
@@ -125,28 +122,28 @@ class TAXII20Client(TAXIIClient):
 
         # Build filters according to spec
         filters = {}
-        
+
         # Pagination limit
         if limit:
             filters["limit"] = limit
-            
+
         # Temporal filter
         if added_after:
             filters["added_after"] = added_after
-        
+
         # Match filters - the taxii2client library may use different parameter names
         if match_id:
             if isinstance(match_id, list):
                 filters["match[id]"] = ",".join(match_id)
             else:
                 filters["match[id]"] = match_id
-                
+
         if match_type:
             if isinstance(match_type, list):
                 filters["match[type]"] = ",".join(match_type)
             else:
                 filters["match[type]"] = match_type
-                
+
         if match_version:
             if isinstance(match_version, list):
                 filters["match[version]"] = ",".join(match_version)
@@ -156,7 +153,7 @@ class TAXII20Client(TAXIIClient):
         # Get objects - should return a STIX bundle
         try:
             bundle = collection.get_objects(**filters)
-            
+
             # The response should already be a bundle according to spec
             # If it's a bundle object, convert to dict
             if hasattr(bundle, "serialize"):
@@ -165,26 +162,14 @@ class TAXII20Client(TAXIIClient):
                 # Ensure it's a proper bundle format
                 if "type" not in bundle:
                     # Wrap in bundle if needed
-                    return {
-                        "type": "bundle",
-                        "id": f"bundle--{collection_id}",
-                        "objects": bundle.get("objects", [])
-                    }
+                    return {"type": "bundle", "id": f"bundle--{collection_id}", "objects": bundle.get("objects", [])}
                 return bundle
             else:
                 # Empty bundle if no results
-                return {
-                    "type": "bundle",
-                    "id": f"bundle--{collection_id}",
-                    "objects": []
-                }
-        except Exception as e:
+                return {"type": "bundle", "id": f"bundle--{collection_id}", "objects": []}
+        except Exception:
             # Return empty bundle on error
-            return {
-                "type": "bundle",
-                "id": f"bundle--{collection_id}",
-                "objects": []
-            }
+            return {"type": "bundle", "id": f"bundle--{collection_id}", "objects": []}
 
     async def get_manifest(
         self,
@@ -198,7 +183,7 @@ class TAXII20Client(TAXIIClient):
     ) -> list[dict]:
         """
         Get object manifest from a collection.
-        
+
         Returns manifest entries as per TAXII 2.0 spec section 5.6.
         """
         if not self.server:
@@ -213,20 +198,20 @@ class TAXII20Client(TAXIIClient):
             filters["limit"] = limit
         if added_after:
             filters["added_after"] = added_after
-            
+
         # Add match filters if supported by the library
         if match_id:
             if isinstance(match_id, list):
                 filters["match[id]"] = ",".join(match_id)
             else:
                 filters["match[id]"] = match_id
-                
+
         if match_type:
             if isinstance(match_type, list):
                 filters["match[type]"] = ",".join(match_type)
             else:
                 filters["match[type]"] = match_type
-                
+
         if match_version:
             if isinstance(match_version, list):
                 filters["match[version]"] = ",".join(match_version)
@@ -246,9 +231,9 @@ class TAXII20Client(TAXIIClient):
                         "id": obj.id if hasattr(obj, "id") else obj.get("id"),
                         "date_added": str(obj.date_added) if hasattr(obj, "date_added") else obj.get("date_added"),
                         "versions": getattr(obj, "versions", obj.get("versions", [])),
-                        "media_types": getattr(obj, "media_types", obj.get("media_types", [
-                            "application/vnd.oasis.stix+json; version=2.0"
-                        ])),
+                        "media_types": getattr(
+                            obj, "media_types", obj.get("media_types", ["application/vnd.oasis.stix+json; version=2.0"])
+                        ),
                     }
                     manifest_data.append(manifest_entry)
             elif isinstance(manifest, dict) and "objects" in manifest:
@@ -260,12 +245,10 @@ class TAXII20Client(TAXIIClient):
 
         return manifest_data
 
-    async def add_objects(
-        self, collection_id: str, objects: list[dict], api_root: str | None = None
-    ) -> dict:
+    async def add_objects(self, collection_id: str, objects: list[dict], api_root: str | None = None) -> dict:
         """
         Add STIX objects to a collection.
-        
+
         Returns status resource as per TAXII 2.0 spec section 4.3.
         """
         if not self.server:
@@ -278,11 +261,7 @@ class TAXII20Client(TAXIIClient):
             raise PermissionError(f"Collection {collection_id} is not writable")
 
         # Create bundle with objects per spec
-        bundle = {
-            "type": "bundle",
-            "id": f"bundle--add-{collection_id}",
-            "objects": objects
-        }
+        bundle = {"type": "bundle", "id": f"bundle--add-{collection_id}", "objects": objects}
 
         # Add objects to collection
         try:
@@ -296,10 +275,7 @@ class TAXII20Client(TAXIIClient):
                 "success_count": 0,
                 "failure_count": len(objects),
                 "pending_count": 0,
-                "failures": [{
-                    "id": obj.get("id", "unknown"),
-                    "message": str(e)
-                } for obj in objects]
+                "failures": [{"id": obj.get("id", "unknown"), "message": str(e)} for obj in objects],
             }
 
         # Build status response according to spec
@@ -312,7 +288,7 @@ class TAXII20Client(TAXIIClient):
             "failure_count": getattr(status, "failure_count", 0),
             "pending_count": getattr(status, "pending_count", 0),
         }
-        
+
         # Add optional fields if present
         if hasattr(status, "successes"):
             status_response["successes"] = status.successes
@@ -320,7 +296,7 @@ class TAXII20Client(TAXIIClient):
             status_response["failures"] = [
                 {
                     "id": f.get("id") if isinstance(f, dict) else str(f),
-                    "message": f.get("message", "") if isinstance(f, dict) else ""
+                    "message": f.get("message", "") if isinstance(f, dict) else "",
                 }
                 for f in status.failures
             ]

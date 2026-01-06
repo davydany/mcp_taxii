@@ -4,6 +4,25 @@ version = "0.1.0"
 description = "MCP Server that serves as a TAXII Client for AI Agents"
 readme = "README.md"
 requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [
+    {name = "MCP TAXII Contributors"}
+]
+keywords = ["mcp", "taxii", "stix", "threat-intelligence", "ai", "claude", "cybersecurity"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Security",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
 dependencies = [
     "fastmcp>=0.1.0",
     "httpx>=0.25.0",
@@ -28,6 +47,13 @@ test-server = [
     "uvicorn[standard]>=0.24.0",
     "sqlalchemy>=2.0.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/davydany/mcp-taxii"
+Documentation = "https://github.com/davydany/mcp-taxii#readme"
+Repository = "https://github.com/davydany/mcp-taxii.git"
+Issues = "https://github.com/davydany/mcp-taxii/issues"
+Changelog = "https://github.com/davydany/mcp-taxii/releases"
 
 [build-system]
 requires = ["hatchling"]

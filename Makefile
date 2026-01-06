@@ -3,7 +3,7 @@
 
 .PHONY: help install sync lint format check test tests test-unit test-integration \
         test-server test-server-stop test-server-logs test-server-status \
-        run clean ci coverage
+        run clean ci coverage build publish-test publish
 
 # Default target
 .DEFAULT_GOAL := help
@@ -162,3 +162,26 @@ clean: test-server-stop ## Clean up generated files
 clean-all: clean ## Deep clean (including .venv)
 	rm -rf .venv uv.lock
 	@echo "$(GREEN)Deep clean completed$(RESET)"
+
+##@ Build & Publish
+
+build: clean ## Build package for distribution
+	uv build
+	@echo "$(GREEN)Package built successfully!$(RESET)"
+	@echo "$(CYAN)Distribution files:$(RESET)"
+	@ls -la dist/
+
+publish-test: build ## Publish to TestPyPI
+	uv publish --publish-url https://test.pypi.org/legacy/
+	@echo "$(GREEN)Published to TestPyPI!$(RESET)"
+	@echo "$(CYAN)Install with: pip install -i https://test.pypi.org/simple/ mcp-taxii$(RESET)"
+
+publish: build ## Publish to PyPI (requires confirmation)
+	@echo "$(RED)WARNING: This will publish to PyPI!$(RESET)"
+	@read -p "Are you sure? [y/N] " confirm && [ "$$confirm" = "y" ] || (echo "Aborted." && exit 1)
+	uv publish
+	@echo "$(GREEN)Published to PyPI!$(RESET)"
+	@echo "$(CYAN)Install with: pip install mcp-taxii$(RESET)"
+
+version: ## Show current version
+	@grep "^version" pyproject.toml | head -1
